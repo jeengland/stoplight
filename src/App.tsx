@@ -34,6 +34,10 @@ const lightOptions: LightOptions = {
   "protectedTurn": {
     lights: { "red": { "position": 1, "color": "red" }, "yellow": { "position": 2, "color": "yellow" }, "green": { "position": 3, "color": "green" }, "specialGreen": { "position": 4, "color": "#20F7B2" } },
     sequence: [{"colors": ["red"], "duration": 1000}, {"colors": ["yellow"], "duration": 1000}, {"colors": ["specialGreen"], "duration": 5000}]
+  },
+  "partyTime": {
+    lights: { "red": { "position": 1, "color": "red" }, "purple": { "position": 3, "color": "purple" }, "green": { "position": 3, "color": "green" }, "orange": { "position": 3, "color": "orange" } },
+    sequence: [{"colors": ["red", "orange"], "duration": 500}, {"colors": ["purple", "green"], "duration": 500}, {"colors": ["purple", "orange", "green"], "duration": 500}, {"colors": ["purple", "orange", "green", "red"], "duration": 500}]
   }
 }; 
 
