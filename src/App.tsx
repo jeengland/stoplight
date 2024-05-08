@@ -1,13 +1,77 @@
+import { useEffect, useState } from "react";
 import Light from "./components/Light";
 
-const colorMap = {
-  "red": "rgb(255, 0, 0)",
-  "yellow": "rgb(255, 255, 0)",
-  "green": "rgb(0, 128, 0)",
+
+interface ColorMap {
+  [key: string]: string; 
+}
+
+const colorMap: ColorMap = {
+  red: "rgb(255, 0, 0)",
+  yellow: "rgb(255, 255, 0)",
+  green: "rgb(0, 128, 0)",
 };
 
+interface LightsState {
+    [colorName: string]: LightData;
+}
+
+interface LightData {
+    position: number;
+    color: string;
+}
+
+interface LightSequenceItem {
+    colors: string[];
+    duration: number;
+}
+
+interface LightOptions {
+    [key: string]: { 
+        lights: Record<string, LightData>; 
+        sequence: LightSequenceItem[];
+    }
+}
+
+const lightOptions: LightOptions = {
+  "standard": { 
+    lights: {"red": {"position": 1, "color": "red"}, "yellow": {"position": 2, "color": "yellow"}, "green": {"position": 3, "color": "green"}},
+    sequence: [{"colors": ["green"], "duration": 3000}, {"colors": ["yellow"], "duration": 1000}, {"colors": ["red"], "duration": 2000}]
+  },
+  "emergency": {
+    lights: {"red": {"position": 1, "color": "red"}, "yellow": {"position": 2, "color": "yellow"}, "green": {"position": 3, "color": "green"}},
+    sequence: [{"colors": ["red"], "duration": 1000}, {"colors": "off", "duration": 1000}]
+  }
+}; 
+
+
+
 function App() {
+  const [lightsData, setLightsData] = useState<LightsState>({})
+  const [sequenceData, setSequenceData] = useState<LightSequenceItem[]>([])
+  const [activeColors, setActiveColors] = useState<string[]>([]); 
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0); 
   
+
+  useEffect(() => {
+    setLightsData(lightOptions.standard.lights)
+    setSequenceData(lightOptions.standard.sequence)
+  }, [])
+
+  useEffect(() => {
+    if (sequenceData.length === 0) return; 
+
+    const step = sequenceData[currentStepIndex];
+    setActiveColors(step.colors);
+
+    const nextChangeInterval = step.duration;
+    const timeoutId = setTimeout(() => {
+        setCurrentStepIndex((currentStepIndex + 1) % sequenceData.length);
+    }, nextChangeInterval);
+
+    return () => clearTimeout(timeoutId); 
+}, [currentStepIndex, sequenceData]);
+
 
   return (
     <div style={{
@@ -20,9 +84,9 @@ function App() {
       alignItems: "center",
       borderRadius: "10px"
     }}>
-      <Light color={colorMap.red} text="red" />
-      <Light color={colorMap.yellow} text="yellow" />
-      <Light color={colorMap.green} text="green" toggled />
+      {Object.entries(lightsData).map(([key, value]) => (
+        <Light key={key} color={colorMap[value.color]} text={key} toggled={activeColors.includes(value.color)} /> 
+    ))}
     </div>
   )
 }

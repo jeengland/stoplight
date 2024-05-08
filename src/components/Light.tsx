@@ -5,34 +5,18 @@ interface LightProps {
   toggled?: boolean;
 }
 
-function adjustColor(color: string, amount: number) {
-  const components = color.match(/\d+/g)?.map(Number);
-  
-  if (!components) {
-    console.error("Invalid color");
-    return;
-  }
-
-  for (let i = 0; i < 3; i++) {
-      components[i] = Math.min(255, Math.max(0, components[i] + amount));
-    }
-
-  return `rgb(${components.join(',')})`;
-}
-
 function Light({ color, text, toggled }: LightProps) {
-  const displayColor = toggled
-    ? adjustColor(color, 100)
-    : adjustColor(color, -100)
-  
   const textColor = toggled
     ? "#FFFFFF"
     : "#000000"
-
+  
+  const brightness = toggled
+    ? 150
+    : 50
 
   return (
     <div style={{
-      backgroundColor: displayColor,
+      backgroundColor: color,
       width: 100,
       height: 100,
       borderRadius: "50%",
@@ -40,7 +24,8 @@ function Light({ color, text, toggled }: LightProps) {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      color: textColor
+      color: textColor,
+      filter: `brightness(${brightness}%)`
           }}>
       {text}
     </div>
