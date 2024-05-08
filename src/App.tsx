@@ -22,7 +22,7 @@ interface LightData {
 }
 
 interface LightSequenceItem {
-    colors: string[];
+    colors: (string[] | "off");
     duration: number;
 }
 
@@ -41,6 +41,10 @@ const lightOptions: LightOptions = {
   "emergency": {
     lights: {"red": {"position": 1, "color": "red"}, "yellow": {"position": 2, "color": "yellow"}, "green": {"position": 3, "color": "green"}},
     sequence: [{"colors": ["red"], "duration": 1000}, {"colors": "off", "duration": 1000}]
+  },
+  "protectedTurn": {
+    lights: { "red": { "position": 1, "color": "red" }, "yellow": { "position": 2, "color": "yellow" }, "green": { "position": 3, "color": "green" }, "specialGreen": { "position": 4, "color": "#20F7B2" } },
+    sequence: [{"colors": ["red"], "duration": 1000}, {"colors": ["yellow"], "duration": 1000}, {"colors": ["specialGreen"], "duration": 5000}]
   }
 }; 
 
@@ -54,15 +58,22 @@ function App() {
   
 
   useEffect(() => {
-    setLightsData(lightOptions.standard.lights)
-    setSequenceData(lightOptions.standard.sequence)
+    const option = lightOptions.emergency
+
+    setLightsData(option.lights)
+    setSequenceData(option.sequence)
   }, [])
 
   useEffect(() => {
-    if (sequenceData.length === 0) return; 
+    if (sequenceData.length === 0) return;
 
     const step = sequenceData[currentStepIndex];
-    setActiveColors(step.colors);
+
+    if (step.colors == "off") {
+        setActiveColors([]);
+    } else {
+        setActiveColors(step.colors);
+    }
 
     const nextChangeInterval = step.duration;
     const timeoutId = setTimeout(() => {
